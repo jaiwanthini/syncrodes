@@ -1,0 +1,45 @@
+# --- Python / backend ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Node / frontend ---
+node_modules/
+.next/
+out/
+build/
+dist/
+.turbo/
+next-env.d.ts
+
+# --- Env files (real secrets -- never commit these) ---
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env.local
+backend/.venv
+
+# --- Supabase CLI local state ---
+supabase/.branches
+supabase/.temp
+
+# --- Logs ---
+*.log
+npm-debug.log*
+
+# --- IDE / OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Coverage ---
+.coverage
+coverage/
