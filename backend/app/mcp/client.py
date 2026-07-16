@@ -39,3 +39,4 @@ class MCPClient:
     def list_connectors(self) -> list[str]:
         """Return a list of all registered connector names."""
         return list(self._connectors.keys())
+mcp_client = MCPClient()        
