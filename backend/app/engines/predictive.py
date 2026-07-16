@@ -1,3 +1,4 @@
+from __future__ import annotations
 from app.mcp.client import mcp_client
 
 RISK_THRESHOLDS = {

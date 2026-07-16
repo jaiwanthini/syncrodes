@@ -7,7 +7,6 @@ from datetime import datetime, timezone
 try:
     from app.mcp.client import mcp_client
 
-    # Mock the cloudwatch connector to simulate an incident
     cloudwatch = mcp_client.get_connector("cloudwatch")
     
     def mock_fetch_events(namespace: str, metric_name: str, minutes: int = 30, **kwargs):
@@ -21,18 +20,20 @@ try:
         return []
 
     if cloudwatch:
-        cloudwatch.fetch_events = mock_fetch_events
+        cloudwatch.fetch_events = mock_fetch_events  # type: ignore
 
-    # We might need to mock get_current_user if it's there
     from app.routers.predictions import router
     # pyrefly: ignore [missing-import]
     from fastapi import FastAPI
     app = FastAPI()
     app.include_router(router)
     
-    # override dependency
+    # 2. FIXED: Return an object with an 'id' attribute to safely mimic Supabase auth
     from app.core.auth import get_current_user
-    app.dependency_overrides[get_current_user] = lambda: {"user": "test"}
+    class MockUser:
+        id = "test-uuid-1234"
+        
+    app.dependency_overrides[get_current_user] = lambda: MockUser()
 
     client = TestClient(app)
     response = client.get("/api/predictions")
