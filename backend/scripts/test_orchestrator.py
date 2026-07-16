@@ -1,5 +1,6 @@
 import sys
 import os
+# pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
 
 # Ensure backend directory is in the path
@@ -9,7 +10,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 load_dotenv()
 
 # Set a dummy API key if not in .env for compilation testing
-os.environ.setdefault("OPENAI_API_KEY", "dummy-key-for-testing")
+os.environ.setdefault("GROQ_API_KEY", "dummy-key-for-testing")
 
 from app.orchestrator.graph import orchestrator_graph
 
