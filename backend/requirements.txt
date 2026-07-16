@@ -4,3 +4,8 @@ supabase
 python-dotenv
 pydantic
 boto3
+requests
+jira
+slack_sdk
+kubernetes
+python-jenkins
