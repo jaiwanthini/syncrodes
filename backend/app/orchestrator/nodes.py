@@ -1,9 +1,10 @@
 from typing import TypedDict
+import os
 # pyrefly: ignore [missing-import]
-from openai import OpenAI
+from groq import Groq
 from app.mcp.client import mcp_client
 
-client = OpenAI()
+client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 class OrchestratorState(TypedDict):
     question: str
@@ -16,7 +17,7 @@ class OrchestratorState(TypedDict):
 
 def intent_parser(state: OrchestratorState) -> OrchestratorState:
     completion = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="llama-3.1-8b-instant",
         messages=[
             {"role": "system", "content": "Classify the DevOps question intent in one word: failure, deployment, performance, or general."},
             {"role": "user", "content": state["question"]},
@@ -57,7 +58,7 @@ def mcp_executor(state: OrchestratorState) -> OrchestratorState:
 def response_synthesizer(state: OrchestratorState) -> OrchestratorState:
     context_text = "\n".join(f"{tool}: {data}" for tool, data in state["tool_results"].items())
     completion = client.chat.completions.create(
-        model="gpt-4o-mini",
+        model="llama-3.1-8b-instant",
         messages=[
             {"role": "system", "content": "You are a DevOps incident assistant. Answer using only the provided tool data."},
             {"role": "user", "content": f"Question: {state['question']}\n\nTool data:\n{context_text}"},

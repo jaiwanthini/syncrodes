@@ -9,5 +9,5 @@ jira
 slack_sdk
 kubernetes
 python-jenkins
-openai
+groq
 langgraph
