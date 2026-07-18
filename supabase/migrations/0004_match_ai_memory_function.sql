@@ -1,4 +1,4 @@
-create or replace function match_ai_memory(query_embedding vector(1536), match_count int)
+create or replace function match_ai_memory(query_embedding vector(384), match_count int)
 returns table (id uuid, incident_id uuid, summary text, resolution text, similarity float)
 language sql stable
 as $$

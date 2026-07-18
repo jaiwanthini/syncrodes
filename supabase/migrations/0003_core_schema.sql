@@ -35,7 +35,7 @@ create table if not exists ai_memory (
   incident_id uuid references incidents(id) on delete cascade,
   summary text not null,
   resolution text,
-  embedding vector(1536),
+  embedding vector(384),
   created_at timestamptz not null default now()
 );
 create index if not exists idx_ai_memory_incident on ai_memory(incident_id);

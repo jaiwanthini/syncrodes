@@ -1,7 +1,10 @@
 # pyrefly: ignore [missing-import]
+from dotenv import load_dotenv
+load_dotenv()
 from fastapi import FastAPI
 from app.routers import orchestrator, rca, predictions
 from app.routers import memory
+
 app = FastAPI(title="Syncrodes API", description="AI-powered DevOps platform API")
 
 # Include routers

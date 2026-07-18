@@ -1,13 +1,12 @@
-from openai import OpenAI
+from sentence_transformers import SentenceTransformer
 from app.core.supabase_client import supabase
 
-client = OpenAI()
-EMBEDDING_MODEL = "text-embedding-3-small"
+# Load the embedding model once
+model = SentenceTransformer("all-MiniLM-L6-v2")
 
 
 def _embed(text: str) -> list[float]:
-    response = client.embeddings.create(model=EMBEDDING_MODEL, input=text)
-    return response.data[0].embedding
+    return model.encode(text).tolist()
 
 
 def store_incident_memory(incident_id: str, summary: str, resolution: str) -> None:
@@ -22,5 +21,11 @@ def store_incident_memory(incident_id: str, summary: str, resolution: str) -> No
 
 def find_similar_incidents(description: str, match_count: int = 5) -> list[dict]:
     embedding = _embed(description)
-    res = supabase.rpc("match_ai_memory", {"query_embedding": embedding, "match_count": match_count}).execute()
+    res = supabase.rpc(
+        "match_ai_memory",
+        {
+            "query_embedding": embedding,
+            "match_count": match_count,
+        },
+    ).execute()
     return res.data or []
