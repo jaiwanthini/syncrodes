@@ -4,6 +4,7 @@ load_dotenv()
 from fastapi import FastAPI
 from app.routers import orchestrator, rca, predictions
 from app.routers import memory
+from app.routers import recommendations
 
 app = FastAPI(title="Syncrodes API", description="AI-powered DevOps platform API")
 
@@ -12,7 +13,9 @@ app.include_router(orchestrator.router)
 app.include_router(rca.router)
 app.include_router(predictions.router)
 app.include_router(memory.router)
+app.include_router(recommendations.router) 
 
 @app.get("/")
 def read_root():
     return {"status": "ok", "message": "Syncrodes API is running."}
+
