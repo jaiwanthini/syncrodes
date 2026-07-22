@@ -2,36 +2,77 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { motion } from "framer-motion";
+import {
+  Bot,
+  ChevronLeft,
+  ChevronRight,
+  LayoutDashboard,
+  Settings,
+  Siren,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useSidebar } from "@/components/layout/SidebarProvider";
+import { Button } from "@/components/ui/button";
 
 export const NAV_ITEMS = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/incidents", label: "Incidents" },
-  { href: "/settings", label: "Settings" },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/incidents", label: "Incidents", icon: Siren },
+  { href: "/chat", label: "AI Chat", icon: Bot },
+  { href: "/settings", label: "Settings", icon: Settings },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { collapsed, toggle } = useSidebar();
 
   return (
-    <aside className="w-56 shrink-0 border-r border-neutral-800 bg-neutral-950 min-h-screen">
-      <div className="px-5 py-4 text-sm font-mono tracking-widest text-neutral-400 uppercase">
-        Syncrodes
+    <aside
+      className={cn(
+        "relative flex min-h-screen shrink-0 flex-col border-r border-border bg-card/40 backdrop-blur-xl transition-all duration-300",
+        collapsed ? "w-[72px]" : "w-64"
+      )}
+    >
+      <div className="flex items-center justify-between px-4 py-5">
+        {!collapsed ? (
+          <div>
+            <p className="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+              Syncrodes
+            </p>
+            <p className="text-sm font-semibold">DevOps AI</p>
+          </div>
+        ) : (
+          <div className="mx-auto h-8 w-8 rounded-lg bg-primary/20 text-center text-sm font-bold leading-8 text-primary">
+            S
+          </div>
+        )}
+        <Button variant="ghost" size="icon" onClick={toggle} className="shrink-0">
+          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+        </Button>
       </div>
-      <nav className="mt-2 flex flex-col gap-1 px-2">
+
+      <nav className="flex flex-1 flex-col gap-1 px-2 pb-4">
         {NAV_ITEMS.map((item) => {
-          const active = pathname === item.href || pathname.startsWith(item.href + "/");
+          const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+          const Icon = item.icon;
           return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={
-                "rounded-md px-3 py-2 text-sm font-medium transition-colors " +
-                (active
-                  ? "bg-neutral-800 text-white"
-                  : "text-neutral-400 hover:bg-neutral-900 hover:text-neutral-200")
-              }
-            >
-              {item.label}
+            <Link key={item.href} href={item.href} className="relative">
+              {active ? (
+                <motion.span
+                  layoutId="sidebar-active"
+                  className="absolute inset-0 rounded-lg bg-primary/15"
+                  transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                />
+              ) : null}
+              <span
+                className={cn(
+                  "relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                  active ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Icon className="h-4 w-4 shrink-0" />
+                {!collapsed ? item.label : null}
+              </span>
             </Link>
           );
         })}
@@ -39,8 +80,3 @@ export function Sidebar() {
     </aside>
   );
 }
-
-/* Dev B (Phase 9 / Phase 15): add "Chat" and "Predictions" entries to NAV_ITEMS above, e.g.:
-   { href: "/chat", label: "Chat" },
-   { href: "/predictions", label: "Predictions" },
-   Pull latest main first -- this is Dev A's file, you are only adding two lines to the array. */
