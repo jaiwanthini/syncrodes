@@ -17,7 +17,7 @@ export async function TimelinePanel({ incidentId }: TimelinePanelProps) {
   }
 
   return (
-    <Card className="glass">
+    <Card>
       <CardHeader>
         <CardTitle>Timeline</CardTitle>
       </CardHeader>

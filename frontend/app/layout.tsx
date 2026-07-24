@@ -1,5 +1,4 @@
 import "./globals.css";
-import { AppShell } from "@/components/layout/AppShell";
 import { ThemeProvider } from "@/components/layout/ThemeProvider";
 
 export const metadata = {
@@ -15,9 +14,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body>
-        <ThemeProvider>
-          <AppShell>{children}</AppShell>
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

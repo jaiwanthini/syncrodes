@@ -11,3 +11,6 @@ kubernetes
 python-jenkins
 groq
 langgraph
+pyjwt
+sentence-transformers
+reportlab

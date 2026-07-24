@@ -21,7 +21,10 @@ def mark_read(notification_id: UUID, user=Depends(get_current_user)):
 
 @router.get("/preferences")
 def get_preferences(user=Depends(get_current_user)):
-    res = supabase.table("user_preferences").select("*").eq("user_id", user.id).execute()
+    try:
+        res = supabase.table("user_preferences").select("*").eq("user_id", user.id).execute()
+    except Exception:
+        return {"slack_enabled": False, "email_enabled": True}
     return res.data[0] if res.data else {"slack_enabled": False, "email_enabled": True}
 
 

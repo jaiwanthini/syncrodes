@@ -1,19 +1,12 @@
 import { API_BASE } from "@/lib/api-config";
-import { createClient } from "@/lib/supabase/client";
+import { createClient } from "@/lib/supabase/server";
 
-async function handleResponse<T>(response: Response): Promise<T> {
-  if (!response.ok) {
-    throw new Error(`API Error: ${response.status}`);
-  }
-  return response.json();
-}
-
-/** Client Component API calls — attaches the signed-in user's session token. */
-export async function apiFetch<T>(
+/** Server Component API calls — attaches the session token from request cookies. */
+export async function apiFetchServer<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -29,5 +22,9 @@ export async function apiFetch<T>(
     headers,
   });
 
-  return handleResponse<T>(response);
+  if (!response.ok) {
+    throw new Error(`API Error: ${response.status}`);
+  }
+
+  return response.json();
 }

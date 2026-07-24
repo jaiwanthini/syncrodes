@@ -9,7 +9,7 @@ interface RootCausePanelProps {
 
 export function RootCausePanel({ rootCause, confidenceScore }: RootCausePanelProps) {
   return (
-    <Card className="glass">
+    <Card>
       <CardHeader>
         <CardTitle>Root Cause</CardTitle>
       </CardHeader>

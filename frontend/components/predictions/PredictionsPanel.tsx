@@ -13,7 +13,7 @@ export async function PredictionsPanel() {
   }
 
   return (
-    <Card className="glass h-full">
+    <Card className="h-full">
       <CardHeader>
         <CardTitle>Predicted Risks</CardTitle>
       </CardHeader>
@@ -27,7 +27,7 @@ export async function PredictionsPanel() {
           predictions.map((prediction) => (
             <div
               key={`${prediction.service}-${prediction.reason}`}
-              className="rounded-lg border border-border/70 bg-background/40 p-3"
+              className="rounded-lg border border-border/70 p-3"
             >
               <div className="flex items-center justify-between gap-2">
                 <p className="font-medium">{prediction.service}</p>

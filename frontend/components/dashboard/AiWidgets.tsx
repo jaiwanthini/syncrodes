@@ -3,7 +3,7 @@ import { Incident } from "@/types/incident";
 import { Recommendation } from "@/types/recommendation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { getRecommendations } from "@/lib/recommendations";
+import { getRecommendations } from "@/lib/recommendations-server";
 import { EmptyState } from "@/components/common/EmptyState";
 import { formatDateTime } from "@/lib/dashboard-metrics";
 
@@ -18,7 +18,7 @@ export function RecentRcaWidget({ incidents }: RecentRcaWidgetProps) {
     .slice(0, 4);
 
   return (
-    <Card className="glass">
+    <Card>
       <CardHeader>
         <CardTitle>Recent Root Cause Analysis</CardTitle>
       </CardHeader>
@@ -72,7 +72,7 @@ export async function AiRecommendationsWidget({ incidents }: AiRecommendationsWi
   );
 
   return (
-    <Card className="glass">
+    <Card>
       <CardHeader>
         <CardTitle>AI Recommendations</CardTitle>
       </CardHeader>
@@ -109,7 +109,7 @@ export function LearnedMemoryWidget({ incidents }: LearnedMemoryWidgetProps) {
     .slice(0, 4);
 
   return (
-    <Card className="glass">
+    <Card>
       <CardHeader>
         <CardTitle>Recently Learned Memory</CardTitle>
       </CardHeader>

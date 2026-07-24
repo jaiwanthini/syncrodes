@@ -57,7 +57,7 @@ export default function SettingsPage() {
   if (!prefs) return null;
 
   return (
-    <Card className="glass max-w-2xl">
+    <Card className="max-w-2xl">
       <CardHeader>
         <CardTitle>Settings</CardTitle>
       </CardHeader>

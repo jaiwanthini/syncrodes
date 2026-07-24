@@ -1,9 +1,9 @@
-print(">>> recommendations router loaded <<<")
 from fastapi import APIRouter, Depends, HTTPException
 from uuid import UUID
 
 from app.core.auth import get_current_user
 from app.core.supabase_client import supabase
+from app.notifications.dispatcher import dispatch_notification
 
 router = APIRouter(prefix="/api/recommendations", tags=["recommendations"])
 
@@ -46,8 +46,8 @@ def _execute_action(action_type: str, incident_id: str) -> None:
 
 
 def _log_audit(recommendation_id: UUID, user_id: str, action: str) -> None:
-    supabase.table("notifications").insert({
-        "user_id": user_id,
-        "type": "recommendation",
-        "message": f"Recommendation {recommendation_id} {action}",
-    }).execute()
+    dispatch_notification(
+        user_id=user_id,
+        notif_type="recommendation",
+        message=f"Recommendation {recommendation_id} {action}",
+    )

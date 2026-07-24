@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { Send, Sparkles } from "lucide-react";
+import { History, Send, Sparkles } from "lucide-react";
 import { askOrchestrator } from "@/lib/orchestrator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,11 +11,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { MarkdownMessage } from "@/components/chat/MarkdownMessage";
 import { useStreamingText } from "@/hooks/useStreamingText";
 import { ErrorState } from "@/components/common/ErrorState";
+import { OrchestratorSimilarIncident } from "@/types/orchestrator";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
   streaming?: boolean;
+  similarIncidents?: OrchestratorSimilarIncident[];
 }
 
 export function ChatPanel() {
@@ -40,7 +43,12 @@ export function ChatPanel() {
       const response = await askOrchestrator({ question });
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: response.answer, streaming: true },
+        {
+          role: "assistant",
+          content: response.answer,
+          streaming: true,
+          similarIncidents: response.similar_incidents,
+        },
       ]);
     } catch {
       setError("Unable to reach the orchestrator API.");
@@ -57,7 +65,7 @@ export function ChatPanel() {
   }
 
   return (
-    <Card className="glass flex h-[calc(100vh-8rem)] flex-col">
+    <Card className="flex h-[calc(100vh-8rem)] flex-col">
       <CardHeader className="border-b border-border/60">
         <CardTitle className="flex items-center gap-2 text-base">
           <Sparkles className="h-4 w-4 text-primary" />
@@ -87,7 +95,11 @@ export function ChatPanel() {
                 }
               >
                 {message.role === "assistant" ? (
-                  <AssistantBubble content={message.content} streaming={message.streaming ?? false} />
+                  <AssistantBubble
+                    content={message.content}
+                    streaming={message.streaming ?? false}
+                    similarIncidents={message.similarIncidents}
+                  />
                 ) : (
                   message.content
                 )}
@@ -126,7 +138,36 @@ export function ChatPanel() {
   );
 }
 
-function AssistantBubble({ content, streaming }: { content: string; streaming: boolean }) {
+function AssistantBubble({
+  content,
+  streaming,
+  similarIncidents,
+}: {
+  content: string;
+  streaming: boolean;
+  similarIncidents?: OrchestratorSimilarIncident[];
+}) {
   const streamed = useStreamingText(content, streaming);
-  return <MarkdownMessage content={streamed} />;
+  return (
+    <div>
+      <MarkdownMessage content={streamed} />
+      {!streaming && similarIncidents && similarIncidents.length > 0 ? (
+        <div className="mt-3 space-y-1.5 border-t border-border/60 pt-2">
+          <p className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+            <History className="h-3.5 w-3.5" />
+            Referenced past incidents
+          </p>
+          {similarIncidents.map((item) => (
+            <Link
+              key={item.id}
+              href={`/incidents/${item.incident_id}`}
+              className="block truncate text-xs text-primary hover:underline"
+            >
+              {item.summary}
+            </Link>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
 }

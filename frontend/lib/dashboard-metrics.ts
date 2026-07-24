@@ -13,7 +13,7 @@ export function countResolvedToday(incidents: Incident[]): number {
 export function buildIncidentTrend(incidents: Incident[]): { date: string; count: number }[] {
   const buckets = new Map<string, number>();
   for (const incident of incidents) {
-    const date = new Date(incident.created_at).toLocaleDateString(undefined, {
+    const date = new Date(incident.created_at).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
     });
@@ -58,7 +58,9 @@ export function buildPredictionConfidence(predictions: Prediction[]) {
 }
 
 export function formatDateTime(value: string): string {
-  return new Date(value).toLocaleString(undefined, {
+  // Pinned locale (not `undefined`) so server-rendered and client-hydrated
+  // output always match, regardless of the browser's locale settings.
+  return new Date(value).toLocaleString("en-US", {
     month: "short",
     day: "numeric",
     hour: "2-digit",

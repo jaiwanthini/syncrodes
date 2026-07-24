@@ -31,7 +31,7 @@ interface ChartCardProps {
 
 function ChartCard({ title, children }: ChartCardProps) {
   return (
-    <Card className="glass">
+    <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm">{title}</CardTitle>
       </CardHeader>

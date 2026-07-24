@@ -40,3 +40,12 @@ class SlackConnector(MCPConnector):
             return {"id": channel.get("id"), "name": channel.get("name")}
         except SlackApiError:
             return {}
+
+    def send_message(self, channel: str, text: str) -> bool:
+        if not self.client:
+            return False
+        try:
+            self.client.chat_postMessage(channel=channel, text=text)
+            return True
+        except SlackApiError:
+            return False

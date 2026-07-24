@@ -1,6 +1,6 @@
-import { apiFetch } from "@/lib/api";
+import { apiFetchServer } from "@/lib/api-server";
 import { Prediction } from "@/types/predictions";
 
 export async function getPredictions(): Promise<Prediction[]> {
-  return apiFetch<Prediction[]>("/api/predictions", { method: "GET" });
+  return apiFetchServer<Prediction[]>("/api/predictions", { method: "GET" });
 }

@@ -16,7 +16,7 @@ export async function SimilarIncidentsPanel({ incidentId, description }: Similar
   }
 
   return (
-    <Card className="glass">
+    <Card>
       <CardHeader>
         <CardTitle>Similar Incidents</CardTitle>
       </CardHeader>

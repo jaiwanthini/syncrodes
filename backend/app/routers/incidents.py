@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from app.core.supabase_client import supabase
 from app.core.auth import get_current_user
 from app.models.schemas import IncidentCreate, IncidentUpdate, IncidentOut
+from app.notifications.dispatcher import dispatch_notification
 
 router = APIRouter(
     prefix="/api/incidents",
@@ -43,7 +44,16 @@ def create_incident(payload: IncidentCreate, user=Depends(get_current_user)):
             detail="Failed to create incident",
         )
 
-    return res.data[0]
+    incident = res.data[0]
+    channels = ["in_app", "slack"] if incident["severity"] in ("high", "critical") else ["in_app"]
+    dispatch_notification(
+        user_id=str(user.id),
+        notif_type="incident",
+        message=f"New {incident['severity']} incident: {incident['title']}",
+        channels=channels,
+    )
+
+    return incident
 
 
 @router.get("/{incident_id}", response_model=IncidentOut)

@@ -1,4 +1,4 @@
-import { getRecommendations } from "@/lib/recommendations";
+import { getRecommendations } from "@/lib/recommendations-server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/common/EmptyState";
@@ -17,7 +17,7 @@ export async function RemediationPanel({ incidentId }: RemediationPanelProps) {
   }
 
   return (
-    <Card className="glass">
+    <Card>
       <CardHeader>
         <CardTitle>AI Recommendations</CardTitle>
       </CardHeader>

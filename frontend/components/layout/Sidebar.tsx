@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
+  Activity,
   Bot,
   ChevronLeft,
   ChevronRight,
@@ -18,6 +19,7 @@ import { Button } from "@/components/ui/button";
 export const NAV_ITEMS = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/incidents", label: "Incidents", icon: Siren },
+  { href: "/predictions", label: "Predictions", icon: Activity },
   { href: "/chat", label: "AI Chat", icon: Bot },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
@@ -29,7 +31,7 @@ export function Sidebar() {
   return (
     <aside
       className={cn(
-        "relative flex min-h-screen shrink-0 flex-col border-r border-border bg-card/40 backdrop-blur-xl transition-all duration-300",
+        "relative flex min-h-screen shrink-0 flex-col border-r border-border bg-card transition-all duration-300",
         collapsed ? "w-[72px]" : "w-64"
       )}
     >

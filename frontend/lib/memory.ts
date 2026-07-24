@@ -1,4 +1,4 @@
-import { apiFetch } from "@/lib/api";
+import { apiFetchServer } from "@/lib/api-server";
 import { SimilarIncident } from "@/types/memory";
 
 export async function getSimilarIncidents(
@@ -6,7 +6,7 @@ export async function getSimilarIncidents(
   description: string
 ): Promise<SimilarIncident[]> {
   const params = new URLSearchParams({ description });
-  return apiFetch<SimilarIncident[]>(
+  return apiFetchServer<SimilarIncident[]>(
     `/api/incidents/${incidentId}/similar?${params.toString()}`,
     { method: "GET" }
   );
