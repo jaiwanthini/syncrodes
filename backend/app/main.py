@@ -2,6 +2,8 @@
 from dotenv import load_dotenv
 load_dotenv()
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.core.config import settings
 from app.routers import orchestrator, rca, predictions
 from app.routers import memory
 from app.routers import recommendations
@@ -12,6 +14,14 @@ from app.routers import incidents
 from app.webhooks import n8n
 
 app = FastAPI(title="Syncrodes API", description="AI-powered DevOps platform API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Include routers
 app.include_router(orchestrator.router)

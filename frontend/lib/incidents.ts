@@ -1,12 +1,12 @@
-import { apiFetch } from "@/lib/api";
+import { apiFetchServer } from "@/lib/api-server";
 import { Incident } from "@/types/incident";
 
 export async function getIncidents(): Promise<Incident[]> {
-  return apiFetch<Incident[]>("/api/incidents", { method: "GET" });
+  return apiFetchServer<Incident[]>("/api/incidents", { method: "GET" });
 }
 
 export async function getIncident(id: string): Promise<Incident> {
-  return apiFetch<Incident>(`/api/incidents/${id}`, { method: "GET" });
+  return apiFetchServer<Incident>(`/api/incidents/${id}`, { method: "GET" });
 }
 
 export async function createIncident(payload: {
@@ -14,7 +14,7 @@ export async function createIncident(payload: {
   description?: string;
   severity?: Incident["severity"];
 }): Promise<Incident> {
-  return apiFetch<Incident>("/api/incidents", {
+  return apiFetchServer<Incident>("/api/incidents", {
     method: "POST",
     body: JSON.stringify(payload),
   });

@@ -71,7 +71,7 @@ class AIMemoryCreate(BaseModel):
     incident_id: UUID
     summary: str
     resolution: Optional[str] = None
-    embedding: List[float] = Field(..., min_length=1536, max_length=1536)
+    embedding: List[float] = Field(..., min_length=384, max_length=384)
 
 
 class AIMemoryOut(BaseModel):

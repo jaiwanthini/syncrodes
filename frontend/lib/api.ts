@@ -1,25 +1,33 @@
-const API_BASE =
-  process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+import { API_BASE } from "@/lib/api-config";
+import { createClient } from "@/lib/supabase/client";
 
+async function handleResponse<T>(response: Response): Promise<T> {
+  if (!response.ok) {
+    throw new Error(`API Error: ${response.status}`);
+  }
+  return response.json();
+}
+
+/** Client Component API calls — attaches the signed-in user's session token. */
 export async function apiFetch<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  console.log("Calling:", `${API_BASE}${endpoint}`);
+  const supabase = createClient();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
-    headers: {
-      "Content-Type": "application/json",
-      ...(options.headers || {}),
-    },
-    ...options,
-  });
-
-  console.log("Status:", response.status);
-
-  if (!response.ok) {
-    throw new Error(`API Error: ${response.status}`);
+  const headers = new Headers(options.headers);
+  headers.set("Content-Type", "application/json");
+  if (session?.access_token) {
+    headers.set("Authorization", `Bearer ${session.access_token}`);
   }
 
-  return response.json();
+  const response = await fetch(`${API_BASE}${endpoint}`, {
+    ...options,
+    headers,
+  });
+
+  return handleResponse<T>(response);
 }

@@ -1,9 +1,12 @@
 from typing import TypedDict
+import logging
 import os
 # pyrefly: ignore [missing-import]
 from groq import Groq
 from app.mcp.client import mcp_client
+from app.engines.memory import find_similar_incidents
 
+logger = logging.getLogger(__name__)
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
 class OrchestratorState(TypedDict):
@@ -12,6 +15,7 @@ class OrchestratorState(TypedDict):
     intent: str
     tools_needed: list[str]
     tool_results: dict
+    similar_incidents: list[dict]
     answer: str
     sources: list[str]
 
@@ -43,7 +47,7 @@ def mcp_executor(state: OrchestratorState) -> OrchestratorState:
         try:
             connector = mcp_client.get_connector(tool_name)
             if not connector:
-                results[tool_name] = {"error": f"Connector {tool_name} not found"}
+                results[tool_name] = {"error": "unavailable"}
                 continue
             kwargs = resource_context.get(tool_name, {})
             results[tool_name] = {
@@ -51,19 +55,62 @@ def mcp_executor(state: OrchestratorState) -> OrchestratorState:
                 "events": connector.fetch_events(**kwargs),
             }
         except Exception as exc:
-            results[tool_name] = {"error": str(exc)}
+            # Never let raw exception text (method names, stack details) reach the
+            # end user via the LLM prompt below — log it server-side instead.
+            logger.warning("MCP tool %r failed in orchestrator: %s", tool_name, exc)
+            results[tool_name] = {"error": "unavailable"}
     state["tool_results"] = results
     return state
 
+def memory_retriever(state: OrchestratorState) -> OrchestratorState:
+    try:
+        state["similar_incidents"] = find_similar_incidents(state["question"], match_count=3)
+    except Exception:
+        state["similar_incidents"] = []
+    return state
+
 def response_synthesizer(state: OrchestratorState) -> OrchestratorState:
-    context_text = "\n".join(f"{tool}: {data}" for tool, data in state["tool_results"].items())
+    available = {
+        tool: data for tool, data in state["tool_results"].items() if "error" not in data
+    }
+    unavailable_tools = [tool for tool in state["tool_results"] if tool not in available]
+
+    context_text = "\n".join(f"{tool}: {data}" for tool, data in available.items())
+    if not context_text:
+        context_text = "(none)"
+
+    similar = state.get("similar_incidents") or []
+    memory_text = "\n".join(
+        f"- {item.get('summary')} (resolution: {item.get('resolution') or 'unknown'})"
+        for item in similar
+    )
+
+    user_content = f"Question: {state['question']}\n\nAvailable tool data:\n{context_text}"
+    if unavailable_tools:
+        user_content += f"\n\nData sources with no data for this question: {', '.join(unavailable_tools)}"
+    if memory_text:
+        user_content += f"\n\nSimilar past incidents from memory:\n{memory_text}"
+
     completion = client.chat.completions.create(
         model="llama-3.1-8b-instant",
         messages=[
-            {"role": "system", "content": "You are a DevOps incident assistant. Answer using only the provided tool data."},
-            {"role": "user", "content": f"Question: {state['question']}\n\nTool data:\n{context_text}"},
+            {
+                "role": "system",
+                "content": (
+                    "You are a DevOps incident assistant. Answer using only the available tool "
+                    "data. If a data source had no data for this question, acknowledge the gap in "
+                    "one plain sentence and suggest what would help (e.g. a specific service or "
+                    "time range) — do not speculate about why it had no data. "
+                    "If similar past incidents are provided, use them to inform your answer and "
+                    "mention when a past resolution is relevant."
+                ),
+            },
+            {"role": "user", "content": user_content},
         ],
     )
     state["answer"] = completion.choices[0].message.content
-    state["sources"] = list(state["tool_results"].keys())
+    sources = list(state["tool_results"].keys())
+    if similar:
+        sources.append("memory")
+    state["sources"] = sources
     return state
