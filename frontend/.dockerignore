@@ -1,0 +1,6 @@
+.git
+node_modules
+.next
+*.log
+.DS_Store
+# .env.local is needed at build time by Next.js for NEXT_PUBLIC_* vars

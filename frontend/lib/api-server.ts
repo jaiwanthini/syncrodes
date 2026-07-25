@@ -1,4 +1,4 @@
-import { API_BASE } from "@/lib/api-config";
+import { API_INTERNAL } from "@/lib/api-config";
 import { createClient } from "@/lib/supabase/server";
 
 /** Server Component API calls — attaches the session token from request cookies. */
@@ -17,7 +17,7 @@ export async function apiFetchServer<T>(
     headers.set("Authorization", `Bearer ${session.access_token}`);
   }
 
-  const response = await fetch(`${API_BASE}${endpoint}`, {
+  const response = await fetch(`${API_INTERNAL}${endpoint}`, {
     ...options,
     headers,
   });
