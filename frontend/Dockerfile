@@ -2,6 +2,15 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 
+# Allow build-time ARGs for NEXT_PUBLIC_* env vars (used by CI)
+# ARG values must be promoted to ENV to be available to RUN commands.
+ARG NEXT_PUBLIC_SUPABASE_URL
+ENV NEXT_PUBLIC_SUPABASE_URL=$NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=$NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 # Copy package files first for caching
 COPY package*.json ./
 RUN npm ci
