@@ -1,150 +1,345 @@
 # Syncrodes
 
+> **AI-Powered DevOps Incident Management Platform**
+
+Syncrodes is an intelligent DevOps platform that predicts, analyzes, and helps resolve production incidents from a single dashboard. It combines **FastAPI**, **Next.js**, **LangGraph**, **Supabase**, and **LLMs** to automate root cause analysis, incident memory, and AI-assisted troubleshooting.
+
 ![CI](https://github.com/YOUR_ORG/YOUR_REPO/actions/workflows/ci.yml/badge.svg)
-<!-- ^ Replace YOUR_ORG/YOUR_REPO with your actual GitHub repository path -->
-
-AI-powered DevOps platform that predicts, investigates, and helps resolve system incidents from a single dashboard.
-
-## Stack
-
-| Layer       | Technology                                           |
-| ----------- | ---------------------------------------------------- |
-| Frontend    | React / Next.js 15 + Tailwind CSS                    |
-| Backend     | FastAPI + LangGraph                                  |
-| AI          | GROQ API                                             |
-| Database    | Supabase (PostgreSQL + pgvector)                      |
-| Auth        | Supabase Auth                                         |
-| Protocol    | MCP (Model Context Protocol)                          |
-| Automation  | n8n (external)                                        |
-
-## Deployment
-
-| Component | Platform     | Connection                         |
-| --------- | ------------ | ---------------------------------- |
-| Frontend  | Vercel       | Automatic via GitHub integration   |
-| Backend   | Railway      | Automatic via GitHub integration   |
 
 ---
 
-## CI Pipeline
+# Features
 
-The project uses **GitHub Actions** for continuous integration. The pipeline is defined in [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
-
-### Trigger
-
-- **Push** to `main` branch
-- **Pull Request** targeting `main` branch
-
-### Pipeline Stages
-
-| #  | Stage                          | Description                                                                     |
-| -- | ------------------------------ | ------------------------------------------------------------------------------- |
-| 1  | **Checkout**                   | Clones the repository                                                           |
-| 2  | **Setup Node.js 20**           | Installs Node.js with `npm` cache from `package-lock.json`                      |
-| 3  | **Setup Python 3.11**          | Installs Python with `pip` cache from `requirements.txt`                        |
-| 4  | **Install frontend deps**      | `npm ci` -- clean, reproducible install                                         |
-| 5  | **Install backend deps**       | `pip install -r requirements.txt`                                               |
-| 6  | **Frontend lint**              | Runs `next lint` only if ESLint config exists (otherwise skipped)               |
-| 7  | **Build Next.js frontend**     | `npm run build` -- compiles the application                                     |
-| 8  | **Verify backend syntax**      | `py_compile` checks syntax (no env vars needed)                                 |
-| 9  | **Backend tests (if present)** | Detects test scripts and reports status (skipped in CI, needs external infra)   |
-| 10 | **Build backend Docker image** | `docker build` using `backend/Dockerfile`                                       |
-| 11 | **Build frontend Docker image**| `docker build` using `frontend/Dockerfile`                                      |
-| 12 | **Verify Docker images**       | Confirms both images were created successfully                                  |
-
-### How Automatic Deployment Works
-
-- **Vercel** (frontend) and **Railway** (backend) are connected directly to the GitHub repository.
-- When code is pushed to `main`, each platform detects the changes and deploys automatically.
-- The GitHub Actions CI workflow **only validates** the project -- it does **not** deploy.
-- This means deployments never happen unless CI passes first.
+- 🤖 AI-powered Root Cause Analysis (RCA)
+- 📊 Incident Monitoring Dashboard
+- 🧠 Incident Memory using Vector Embeddings
+- 🔍 Semantic Search for Previous Incidents
+- ⚡ LangGraph-based AI Agent Workflow
+- 🔐 Secure Authentication with Supabase
+- 📈 Predictive Incident Analysis
+- 📝 AI-generated Incident Summaries
+- 🔄 Dockerized Development & Deployment
+- 🚀 Automatic CI with GitHub Actions
 
 ---
 
-## Prerequisites
+# Tech Stack
 
-- Python 3.11+
-- Node 20+
-- A Supabase project
-- GROQ API key
-- Docker (optional, for Docker Compose)
+| Layer | Technology |
+|--------|------------|
+| Frontend | Next.js 15, React, Tailwind CSS |
+| Backend | FastAPI, LangGraph |
+| AI | Groq API |
+| Database | Supabase PostgreSQL + pgvector |
+| Authentication | Supabase Auth |
+| Vector Search | Sentence Transformers + pgvector |
+| Deployment | Vercel (Frontend), Render (Backend) |
+| CI/CD | GitHub Actions |
+| Containerization | Docker & Docker Compose |
 
-## Setup
+---
 
+# System Architecture
+
+```text
+                +---------------------+
+                |     Next.js UI      |
+                +----------+----------+
+                           |
+                     REST API Calls
+                           |
+                +----------v----------+
+                |      FastAPI        |
+                +----------+----------+
+                           |
+        +------------------+------------------+
+        |                  |                  |
+        |                  |                  |
+   LangGraph         Memory Engine      Supabase Auth
+        |                  |
+        |                  |
+        +---------+--------+
+                  |
+         Supabase PostgreSQL
+            + pgvector DB
+                  |
+             Previous Incidents
 ```
-git clone <repo-url>
+
+---
+
+# Deployment
+
+| Component | Platform |
+|-----------|----------|
+| Frontend | Vercel |
+| Backend | Render |
+| Database | Supabase |
+
+Deployment is automatically triggered whenever changes are pushed to the **main** branch.
+
+---
+
+# Continuous Integration
+
+GitHub Actions automatically performs:
+
+- Repository Checkout
+- Node.js Setup
+- Python Setup
+- Install Dependencies
+- Frontend Build
+- Backend Validation
+- Docker Image Build
+- Docker Verification
+
+The workflow ensures that every commit builds successfully before deployment.
+
+---
+
+# Project Structure
+
+```text
+syncrodes/
+│
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+│
+├── backend/
+│   ├── app/
+│   │   ├── core/
+│   │   ├── routers/
+│   │   ├── services/
+│   │   ├── memory/
+│   │   ├── orchestrator/
+│   │   ├── engines/
+│   │   ├── webhooks/
+│   │   └── mcp/
+│   ├── Dockerfile
+│   └── requirements.txt
+│
+├── frontend/
+│   ├── app/
+│   ├── components/
+│   ├── lib/
+│   ├── public/
+│   ├── styles/
+│   └── Dockerfile
+│
+├── docker-compose.yml
+└── README.md
+```
+
+---
+
+# Installation
+
+## Clone Repository
+
+```bash
+git clone https://github.com/<username>/syncrodes.git
+
 cd syncrodes
+```
 
-# Backend
+---
+
+## Backend Setup
+
+```bash
 cd backend
-cp .env.example .env
-# fill in real values in .env
-pip install -r requirements.txt
 
-# Frontend
-cd ../frontend
-cp .env.local.example .env.local
-# fill in real values in .env.local
+python -m venv .venv
+
+# Linux / macOS
+source .venv/bin/activate
+
+# Windows
+.venv\Scripts\activate
+
+pip install -r requirements.txt
+```
+
+---
+
+## Frontend Setup
+
+```bash
+cd frontend
+
 npm install
 ```
 
-## Running locally
+---
 
-### Without Docker
+# Environment Variables
 
+### Backend (.env)
+
+```env
+SUPABASE_URL=
+
+SUPABASE_KEY=
+
+SUPABASE_SERVICE_ROLE_KEY=
+
+GROQ_API_KEY=
+
+JWT_SECRET=
 ```
-# terminal 1
-cd backend && uvicorn app.main:app --reload
 
-# terminal 2
-cd frontend && npm run dev
-```
+### Frontend (.env.local)
 
-### With Docker
+```env
+NEXT_PUBLIC_SUPABASE_URL=
 
-```
-docker compose up --build
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+
+NEXT_PUBLIC_API_URL=
 ```
 
 ---
 
-## Project Structure
+# Running Locally
 
-```
-.github/workflows/
-  ci.yml                  # CI pipeline definition
-backend/
-  app/                    # FastAPI application code
-    core/                 # Config, auth, Supabase client
-    engines/              # Predictive, RCA, memory engines
-    mcp/                  # MCP connectors (CloudWatch, GitHub, Jira, Slack, K8s, Jenkins)
-    orchestrator/         # LangGraph orchestrator graph & nodes
-    routers/              # API route handlers
-    webhooks/             # n8n webhook endpoints
-  Dockerfile
-  requirements.txt
-frontend/
-  app/                    # Next.js App Router pages
-  components/             # React components
-  lib/                    # API clients, Supabase helpers
-  types/                  # TypeScript type definitions
-  Dockerfile
-  package.json
-docker-compose.yml        # Local development with Docker
+## Backend
+
+```bash
+cd backend
+
+uvicorn app.main:app --reload
 ```
 
-## GitHub Secrets Required
+Runs on:
 
-The CI pipeline uses these optional secrets for build-time environment variables:
+```
+http://localhost:8000
+```
 
-| Secret                        | Purpose                                        | Required? |
-| ----------------------------- | ---------------------------------------------- | --------- |
-| `NEXT_PUBLIC_SUPABASE_URL`    | Supabase project URL (build-time fallback)      | No        |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key (build-time fallback)        | No        |
-| `NEXT_PUBLIC_API_URL`         | Backend API URL (build-time fallback)            | No        |
+---
 
-The pipeline provides safe placeholder values when secrets are not set, so CI will pass even without them.
+## Frontend
 
-## License
+```bash
+cd frontend
 
-See [LICENSE](./LICENSE).
+npm run dev
+```
+
+Runs on:
+
+```
+http://localhost:3000
+```
+
+---
+
+# Running with Docker
+
+Build and start both services:
+
+```bash
+docker compose up --build
+```
+
+Stop containers:
+
+```bash
+docker compose down
+```
+
+---
+
+# API Overview
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/login` | User Authentication |
+| POST | `/signup` | User Registration |
+| GET | `/incidents` | Fetch Incidents |
+| POST | `/incident` | Create Incident |
+| POST | `/predict` | Predict Incident |
+| POST | `/rca` | Root Cause Analysis |
+| POST | `/memory/search` | Search Previous Incidents |
+
+---
+
+# GitHub Actions
+
+The CI workflow automatically:
+
+- Builds the frontend
+- Validates backend code
+- Builds Docker images
+- Verifies successful image creation
+
+No deployment occurs unless the project builds successfully.
+
+---
+
+# Screenshots
+
+Place screenshots inside a `docs/` folder.
+
+```text
+docs/
+├── dashboard.png
+├── login.png
+└── incident.png
+```
+
+Example:
+
+```markdown
+## Dashboard
+
+![Dashboard](docs/dashboard.png)
+```
+
+---
+
+# Future Enhancements
+
+- Slack Notifications
+- Microsoft Teams Integration
+- Kubernetes Monitoring
+- AWS CloudWatch Integration
+- Jenkins Integration
+- AI Chat Assistant
+- Predictive Failure Detection
+- Real-time Incident Alerts
+
+---
+
+# Contributing
+
+1. Fork the repository
+
+2. Create a feature branch
+
+```bash
+git checkout -b feature-name
+```
+
+3. Commit your changes
+
+```bash
+git commit -m "Add feature"
+```
+
+4. Push your branch
+
+```bash
+git push origin feature-name
+```
+
+5. Open a Pull Request
+
+---
+
+# License
+
+This project is licensed under the **MIT License**.
+
+For more information, see the [LICENSE](LICENSE) file.
