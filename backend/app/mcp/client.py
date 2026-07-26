@@ -17,20 +17,24 @@ class MCPClient:
 
     def _register_default_connectors(self):
         """Automatically registers all known connectors."""
-        connectors = [
-            CloudWatchConnector(),
-            GitHubConnector(),
-            JiraConnector(),
-            SlackConnector(),
-            KubernetesConnector(),
-            JenkinsConnector()
+        connector_classes = [
+            CloudWatchConnector,
+            GitHubConnector,
+            JiraConnector,
+            SlackConnector,
+            KubernetesConnector,
+            JenkinsConnector,
         ]
-        for connector in connectors:
-            self.register_connector(connector)
 
-    def register_connector(self, connector: MCPConnector):
-        """Register a single connector instance."""
-        self._connectors[connector.name] = connector
+        for connector_cls in connector_classes:
+            try:
+                connector = connector_cls()
+                self._connectors[connector.name] = connector
+                print(f"Loaded connector: {connector.name}")
+            except Exception as e:
+                print(f"Skipping {connector_cls.__name__}: {e}")
+
+
 
     def get_connector(self, name: str) -> Optional[MCPConnector]:
         """Retrieve a connector by its name identifier."""
@@ -39,4 +43,4 @@ class MCPClient:
     def list_connectors(self) -> list[str]:
         """Return a list of all registered connector names."""
         return list(self._connectors.keys())
-mcp_client = MCPClient()        
+mcp_client = MCPClient()
