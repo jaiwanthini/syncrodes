@@ -9,6 +9,14 @@ from app.engines.memory import find_similar_incidents
 logger = logging.getLogger(__name__)
 client = Groq(api_key=os.environ.get("GROQ_API_KEY"))
 
+# Fallback resource identifiers when the caller doesn't pass explicit context.
+# Fill in real values for whichever sources you want the orchestrator to query.
+DEFAULT_CONTEXT = {
+    "github": {"owner": "YOUR_GITHUB_USERNAME", "repo": "YOUR_REPO_NAME"},
+    "jira": {"project": "KAN"},
+    "slack": {"channel": "YOUR_SLACK_CHANNEL_ID"},
+}
+
 class OrchestratorState(TypedDict):
     question: str
     context: dict
@@ -32,12 +40,12 @@ def intent_parser(state: OrchestratorState) -> OrchestratorState:
 
 def tool_selector(state: OrchestratorState) -> OrchestratorState:
     intent_to_tools = {
-        "failure": ["cloudwatch", "kubernetes", "github"],
+        "failure": ["github", "jira", "slack"],
         "deployment": ["github", "jenkins"],
-        "performance": ["cloudwatch", "kubernetes"],
+        "performance": ["github"],
         "general": ["slack", "jira"],
     }
-    state["tools_needed"] = intent_to_tools.get(state["intent"], ["cloudwatch"])
+    state["tools_needed"] = intent_to_tools.get(state["intent"], ["github"])
     return state
 
 def mcp_executor(state: OrchestratorState) -> OrchestratorState:
@@ -49,14 +57,23 @@ def mcp_executor(state: OrchestratorState) -> OrchestratorState:
             if not connector:
                 results[tool_name] = {"error": "unavailable"}
                 continue
-            kwargs = resource_context.get(tool_name, {})
-            results[tool_name] = {
-                "logs": connector.fetch_logs(**kwargs),
-                "events": connector.fetch_events(**kwargs),
-            }
+            kwargs = resource_context.get(tool_name) or DEFAULT_CONTEXT.get(tool_name, {})
+
+            logs, events = [], []
+            try:
+                logs = connector.fetch_logs(**kwargs)
+            except Exception:
+                pass
+            try:
+                events = connector.fetch_events(**kwargs)
+            except Exception:
+                pass
+
+            if not logs and not events:
+                results[tool_name] = {"error": "unavailable"}
+            else:
+                results[tool_name] = {"logs": logs, "events": events}
         except Exception as exc:
-            # Never let raw exception text (method names, stack details) reach the
-            # end user via the LLM prompt below — log it server-side instead.
             logger.warning("MCP tool %r failed in orchestrator: %s", tool_name, exc)
             results[tool_name] = {"error": "unavailable"}
     state["tool_results"] = results

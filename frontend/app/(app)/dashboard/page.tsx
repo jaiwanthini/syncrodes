@@ -30,36 +30,15 @@ export default async function DashboardPage() {
   const critical = incidents.filter((incident) => incident.severity === "critical").length;
   const investigating = incidents.filter((incident) => incident.status === "investigating").length;
   const resolvedToday = countResolvedToday(incidents);
-
   const serviceNames = predictions.map((prediction) => prediction.service);
 
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard
-          label="Open Incidents"
-          value={open}
-          icon={Siren}
-          indicatorClassName="bg-destructive"
-        />
-        <StatCard
-          label="Critical Incidents"
-          value={critical}
-          icon={AlertTriangle}
-          indicatorClassName="bg-warning"
-        />
-        <StatCard
-          label="Investigating"
-          value={investigating}
-          icon={Radar}
-          indicatorClassName="bg-primary"
-        />
-        <StatCard
-          label="Resolved Today"
-          value={resolvedToday}
-          icon={CheckCircle2}
-          indicatorClassName="bg-success"
-        />
+        <StatCard label="Open Incidents" value={open} icon={Siren} indicatorClassName="bg-destructive" />
+        <StatCard label="Critical Incidents" value={critical} icon={AlertTriangle} indicatorClassName="bg-warning" />
+        <StatCard label="Investigating" value={investigating} icon={Radar} indicatorClassName="bg-primary" />
+        <StatCard label="Resolved Today" value={resolvedToday} icon={CheckCircle2} indicatorClassName="bg-success" />
       </div>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">

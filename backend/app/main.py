@@ -1,3 +1,12 @@
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # tighten this to your real Vercel URL once you have it
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
 load_dotenv()
