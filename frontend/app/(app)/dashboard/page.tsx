@@ -17,6 +17,8 @@ import {
   buildSeverityDistribution,
   countResolvedToday,
 } from "@/lib/dashboard-metrics";
+import { FadeIn } from "@/components/motion/FadeIn";
+import { StaggerContainer, StaggerItem } from "@/components/motion/Stagger";
 
 export const dynamic = "force-dynamic";
 
@@ -34,32 +36,42 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Open Incidents" value={open} icon={Siren} indicatorClassName="bg-destructive" />
-        <StatCard label="Critical Incidents" value={critical} icon={AlertTriangle} indicatorClassName="bg-warning" />
-        <StatCard label="Investigating" value={investigating} icon={Radar} indicatorClassName="bg-primary" />
-        <StatCard label="Resolved Today" value={resolvedToday} icon={CheckCircle2} indicatorClassName="bg-success" />
-      </div>
+      <StaggerContainer className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StaggerItem>
+          <StatCard label="Open Incidents" value={open} icon={Siren} indicatorClassName="bg-destructive" />
+        </StaggerItem>
+        <StaggerItem>
+          <StatCard label="Critical Incidents" value={critical} icon={AlertTriangle} indicatorClassName="bg-warning" />
+        </StaggerItem>
+        <StaggerItem>
+          <StatCard label="Investigating" value={investigating} icon={Radar} indicatorClassName="bg-primary" />
+        </StaggerItem>
+        <StaggerItem>
+          <StatCard label="Resolved Today" value={resolvedToday} icon={CheckCircle2} indicatorClassName="bg-success" />
+        </StaggerItem>
+      </StaggerContainer>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+      <FadeIn delay={0.15} className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <div className="xl:col-span-2">
           <RecentIncidentsTable incidents={incidents} />
         </div>
         <PredictionsPanel />
-      </div>
+      </FadeIn>
 
-      <DashboardCharts
-        trend={buildIncidentTrend(incidents)}
-        severity={buildSeverityDistribution(incidents)}
-        byService={buildIncidentsByService(incidents, serviceNames)}
-        confidence={buildPredictionConfidence(predictions)}
-      />
+      <FadeIn delay={0.25}>
+        <DashboardCharts
+          trend={buildIncidentTrend(incidents)}
+          severity={buildSeverityDistribution(incidents)}
+          byService={buildIncidentsByService(incidents, serviceNames)}
+          confidence={buildPredictionConfidence(predictions)}
+        />
+      </FadeIn>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+      <FadeIn delay={0.35} className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         <RecentRcaWidget incidents={incidents} />
         <AiRecommendationsWidget incidents={incidents} />
         <LearnedMemoryWidget incidents={incidents} />
-      </div>
+      </FadeIn>
     </div>
   );
 }

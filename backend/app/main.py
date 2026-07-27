@@ -1,12 +1,3 @@
-from fastapi.middleware.cors import CORSMiddleware
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # tighten this to your real Vercel URL once you have it
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 # pyrefly: ignore [missing-import]
 from dotenv import load_dotenv
 load_dotenv()
@@ -47,4 +38,3 @@ app.include_router(n8n.router)
 @app.get("/")
 def read_root():
     return {"status": "ok", "message": "Syncrodes API is running."}
-
